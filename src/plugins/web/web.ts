@@ -105,13 +105,13 @@ export default function Web<O>(
       mediaQueryLists = []
       for (const value in options.breakpoints || []) {
         const mediaQueryList: MediaQueryList & { __media?: string } =
-          window.matchMedia(value)
+          options.window.matchMedia(value)
         mediaQueryList.__media = value
         mediaQueryLists.push(mediaQueryList)
         events.add(mediaQueryList, 'change', breakPointChange)
       }
-      events.add(window, 'orientationchange', resizeFix)
-      events.add(window, 'resize', resize)
+      events.add(options.window, 'orientationchange', resizeFix)
+      events.add(options.window, 'resize', resize)
       checkBreakpoint()
     }
 
@@ -215,10 +215,14 @@ export default function Web<O>(
     }
 
     function updateSlides() {
-      slider.slides = elems(slider.options.selector, slider.container)
+      slider.slides = elems(
+        slider.options.selector,
+        slider.container,
+        options.window
+      )
     }
 
-    slider.container = elem(container)
+    slider.container = elem(container, undefined, slider.options.window)
 
     slider.destroy = () => {
       events.purge()

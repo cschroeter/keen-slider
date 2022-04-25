@@ -41,6 +41,7 @@ export type SliderOptions<O = {}> = {
   range?: { align?: boolean; min?: number; max?: number }
   rtl?: boolean
   trackConfig?: TrackSlidesConfigOption
+  window?: typeof window
 } & O
 
 export type SliderInstance<O = {}, C = {}, H extends string = string> = {

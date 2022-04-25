@@ -6,8 +6,10 @@ export function now(): number {
   return Date.now()
 }
 
-export function dir(element): string {
-  return window.getComputedStyle(element, null).getPropertyValue('direction')
+export function dir(element: HTMLElement | null): string {
+  if (!element) return 'ltr'
+  const win = element.ownerDocument?.defaultView ?? window
+  return win.getComputedStyle(element, null).getPropertyValue('direction')
 }
 
 export function setAttr(elem: HTMLElement, name: string, value: string): void {
@@ -25,9 +27,10 @@ export function elem(
     | ((
         wrapper: HTMLElement | Document
       ) => HTMLElement[] | NodeList | HTMLCollection | null),
-  wrapper?: HTMLElement
+  wrapper?: HTMLElement,
+  win?: typeof window
 ): HTMLElement {
-  const elements = elems(element, wrapper || document)
+  const elements = elems(element, wrapper || win.document, win)
   return elements.length ? elements[0] : null
 }
 
@@ -48,18 +51,19 @@ export function elems(
         | NodeList
         | HTMLCollection
         | null),
-  wrapper: HTMLElement | Document
+  wrapper: HTMLElement | Document,
+  win: typeof window
 ): HTMLElement[] {
-  wrapper = wrapper || document
+  wrapper = wrapper || win.document
   if (typeof elements === 'function') elements = elements(wrapper)
 
   return Array.isArray(elements)
     ? elements
     : typeof elements === 'string'
     ? toArray(wrapper.querySelectorAll(elements))
-    : elements instanceof HTMLElement
+    : elements instanceof win.HTMLElement
     ? [elements]
-    : elements instanceof NodeList
+    : elements instanceof win.NodeList
     ? toArray(elements)
     : []
 }
